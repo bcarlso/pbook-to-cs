@@ -12,21 +12,21 @@ namespace PBookToCs
         public string GenerateFrom(string pBook) {
             var lines = new List<string>(pBook.Split(NEWLINE));
 
-            var prefix = "";
+            var prefix = NEWLINE;
 
             var className = ExtractClassNameFrom(lines[0]);
-            var result = ("namespace AutomationSpike" + NEWLINE + "{" + NEWLINE + "    enum " + className + NEWLINE + "    {");
+            var result = $"namespace AutomationSpike{NEWLINE}{{{NEWLINE}    enum {className}{NEWLINE}    {{";
 
             foreach(string line in lines.GetRange(1, lines.Count-1)) {
                 foreach(Match m in Regex.Matches(line, "^(\\s+)(.+?)(\\s+)(.+?)POS\\((\\d+)\\)"))
                 {
                     var enumElementName = new PL1IdentifierToTitleCaseConverter(m.Groups[2].Value).ToTitleCase();
-                    result += (prefix + NEWLINE + "        " + enumElementName + " = " + m.Groups[5].Value);
-                    prefix = ",";
+                    result += ($"{prefix}        {enumElementName} = {m.Groups[5].Value}");
+                    prefix = $",{NEWLINE}";
                 }
             }
             
-            return result + NEWLINE + "    }" + NEWLINE + "}";
+            return $"{result}{NEWLINE}    }}{NEWLINE}}}";
         }
 
         private string ExtractClassNameFrom(string declaration)
